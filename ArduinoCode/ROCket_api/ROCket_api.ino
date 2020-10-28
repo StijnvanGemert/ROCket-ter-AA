@@ -33,7 +33,18 @@ https://github.com/adafruit/Adafruit_Sensor
 |* DEFINES
 |*------------------------------------------------------------------------------
 */
+#define DEBUG           TRUE
+
+#define FIRMWAREVERSION 0.02f
+#define LEDNRA         1          // define LED pins
+#define LEDNRB         2 
+#define BATPIN         34
+
+#define BMP280         1
+#define LSM9DS1        2
+
 #define MAXLOOP       100
+#define SPDELAY       10
 
 #define START         "##"
 #define SEPARATOR     "^"
@@ -42,6 +53,8 @@ https://github.com/adafruit/Adafruit_Sensor
 // Set commando's
 #define TIMESTAMP     "TS"
 #define ALLSENSOR     "AO"
+#define LEDA          "LA"
+#define LEDB          "LB"
 
 #define TEMP          "TE"
 #define LOCALPRES     "LP"
@@ -66,6 +79,8 @@ https://github.com/adafruit/Adafruit_Sensor
 #define GETMULTIPLE   "GM"
 #define BATSTAT       "BS"
 #define FWVERSION     "FW"
+#define STATUS        "ST"
+
 /*------------------------------------------------------------------------------
 |* MACROS
 |*------------------------------------------------------------------------------
@@ -95,10 +110,12 @@ BluetoothSerial SerialBT;
 
 // select GO/GM output data
 bool set_TS = 1;                                 // Time Stamp
+bool set_LEDA = 0;                               // Led status
+bool set_LEDB = 0;  
 
 bool set_TE = 1;                                 // Temp
 bool set_PE = 1;                                 // barometer
-bool set_HE = 0;                                 // calculated height
+bool set_HE = 1;                                 // calculated height
 
 bool set_AX = 1;                                 // accelorometer x
 bool set_AY = 1;                                 // accelorometer y
@@ -121,14 +138,11 @@ bool set_GZ = 1;                                 // gyro x
 |* In/Out       : str: string to print
 |*                endline: true to add endline to the string 
 */ 
-void printTo(String str, bool endline)
+void printTo(String str)
 {
   #ifdef DEBUG
-    if(endline == true){
-      Serial.println(str);
-    }else{
-      Serial.print(str);
-    }
+      SerialBT.print(str + "\n");
+      delay(SPDELAY);
   #endif 
 }
 
@@ -144,20 +158,22 @@ void serialEvent()
   String m_inputString;
   char m_char;
 
-  while (Serial.available())
+  while (SerialBT.available())
   {
-    m_char = Serial.read();
+    m_char = SerialBT.read();
     m_inputString = m_inputString + m_char;
   }
   if (m_inputString != "")
   {
+    SerialBT.flush();
     Serial.println("Command received is: " + m_inputString);
+   // delay(SPDELAY);
     HandleSerialBTCommand(m_inputString);
   }
 }
 
 
-/* function     : printTo(void)
+/* function     : HandleSerialBTCommand(void)
 |* 
 |* Description  : split commands with IndexOf and substring function
 |*
@@ -176,8 +192,11 @@ void HandleSerialBTCommand(String a_inputString)
   m_inputStringLength = a_inputString.length();																                                // get string lenght 
   m_endIndexOfMessage = a_inputString.indexOf(END) + String(END).length() +1;								                  // find the position of the END characters
   a_inputString.remove(a_inputString.indexOf(END),  m_endIndexOfMessage);									                    // remove the END characters
-  
- if (m_inputStringLength - m_endIndexOfMessage == 0)                                                          // check if received commando is correct (START and END both found)
+//  Serial.println("length is : " + (String) m_inputStringLength);
+//  delay(SPDELAY);
+//  Serial.println("end is : " +(String) m_endIndexOfMessage);
+//  delay(SPDELAY);
+ if (1)//(m_inputStringLength - m_endIndexOfMessage == 0)                                                          // check if received commando is correct (START and END both found)
  {                                                                                                            
     if (a_inputString.indexOf(START) >= 0)                                                                    // string START is ok
     {
@@ -194,7 +213,8 @@ void HandleSerialBTCommand(String a_inputString)
         
         m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);                        // get end char
         m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              // get substring
-        Serial.println("remaining string is : " + (String)m_remainingString);                                 // print string
+       // Serial.println("remaining string is : " + (String)m_remainingString);                                 // print string
+        //delay(SPDELAY);
         processSubString(m_remainingString);                                                                  // do something with the command
       }while((m_endIndexOfMessage > 0) && (m_sanityCheck < MAXLOOP));                                         // loop untill string is proccesed of code goes insane
     }
@@ -222,7 +242,7 @@ void processSubString(String a_inputString)
     m_startIndexOfMessage = String(GETONE).length();  
     m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
     m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);                   
-    doSomePrinting();
+    doSomeBTPrinting();
   }
   else if (a_inputString.indexOf(GETMULTIPLE) >= 0)                                                           // Get multiple measurements 
   {
@@ -230,9 +250,10 @@ void processSubString(String a_inputString)
     m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
     m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
     m_receivedInt = m_remainingString.toInt();
+   // printTo((String)m_receivedInt);
     for(int index = 0; index < m_receivedInt; index++)
     {
-      doSomePrinting();
+      doSomeBTPrinting();
     }
   }
   else if (a_inputString.indexOf(TIMESTAMP) >= 0)                                                             // set timestamp output on / off
@@ -242,6 +263,47 @@ void processSubString(String a_inputString)
     m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
     m_receivedInt = m_remainingString.toInt();
     set_TS = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(LEDA) >= 0)                                                                 // set LedA on / off
+  {
+    m_startIndexOfMessage = String(LEDA).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    setLed(LEDNRA, m_receivedInt);
+    //set_LEDA = m_receivedInt;
+  }
+    else if (a_inputString.indexOf(LEDB) >= 0)                                                                 // set LedB on / off
+  {
+    m_startIndexOfMessage = String(LEDB).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    setLed(LEDNRB, m_receivedInt);
+    //set_LEDB = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(BATSTAT) >= 0)                                                                 // set LedB on / off
+  {
+    m_startIndexOfMessage = String(BATSTAT).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);  
+    printTo("##BS" + (String)getBatteryStatus() + "^!!");            
+  }
+    else if (a_inputString.indexOf(FWVERSION) >= 0)                                                                 // set LedB on / off
+  {
+    m_startIndexOfMessage = String(FWVERSION).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);  
+    printTo("##FW" + (String)FIRMWAREVERSION + "^!!"); 
+     
+  }
+      else if (a_inputString.indexOf(STATUS) >= 0)                                                                 // set LedB on / off
+  {
+    m_startIndexOfMessage = String(FWVERSION).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);  
+    printTo("##FW" + (String)FIRMWAREVERSION + "^BS" + (String)getBatteryStatus() + "^!!"); 
+     
   }
   else if (a_inputString.indexOf(TEMP) >= 0)                                                                 // set temperature output on / off
   {
@@ -253,23 +315,100 @@ void processSubString(String a_inputString)
   }
   else if (a_inputString.indexOf(PRESSURE) >= 0)                                                              // set pressure output on / off
   {
-    
+     m_startIndexOfMessage = String(PRESSURE).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_PE = m_receivedInt;
   }
   else if (a_inputString.indexOf(HEIGHT) >= 0)                                                                // set height calculation output on / off
   {
-    
+     m_startIndexOfMessage = String(HEIGHT).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_HE = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(LOCALPRES) >= 0)                                                                // set height calculation output on / off
+  {
+     m_startIndexOfMessage = String(HEIGHT).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+
+    BMP280LocalAirPress = m_remainingString.toFloat();
+
   }
   else if (a_inputString.indexOf(ACCX) >= 0)                                                                  // set accelero X output on / off                                          
   {
-    
+     m_startIndexOfMessage = String(ACCX).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_AX = m_receivedInt;
   }
   else if (a_inputString.indexOf(ACCY) >= 0)                                                                  // set accelero Y output on / off     
   {
-    
+     m_startIndexOfMessage = String(ACCY).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_AY = m_receivedInt;
   }
   else if (a_inputString.indexOf(ACCZ) >= 0)                                                                  // set accelero Z output on / off     
   {
-    
+     m_startIndexOfMessage = String(ACCZ).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_TE = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(MAGX) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(MAGX).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_MX = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(MAGY) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(MAGY).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_MY = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(MAGZ) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(MAGZ).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_MZ = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(GYROX) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(GYROX).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_GX = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(GYROY) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(GYROY).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_GY = m_receivedInt;
+  }
+  else if (a_inputString.indexOf(GYROZ) >= 0)                                                                  // set accelero Z output on / off     
+  {
+     m_startIndexOfMessage = String(GYROZ).length();  
+    m_endIndexOfMessage = a_inputString.indexOf(SEPARATOR, m_startIndexOfMessage);
+    m_remainingString = a_inputString.substring(m_startIndexOfMessage, m_endIndexOfMessage);              
+    m_receivedInt = m_remainingString.toInt();
+    set_GZ = m_receivedInt;
   }
   else
   {
@@ -277,7 +416,27 @@ void processSubString(String a_inputString)
   }
 }
 
+void blinkError(int error){
+  
+}
 
+void sendMsgBack(String a_msgBack)
+{
+  
+}
+
+float getBatteryStatus(void)
+{
+  float adc_value;
+  adc_value = analogRead(BATPIN);
+  adc_value = (adc_value * 3.3 ) / (4095);
+  return adc_value;
+}
+
+void setLed(int ledNr, bool state)
+{
+  digitalWrite(ledNr, state);
+}
 
 /* function     : setupBMP280(void)
 |* 
@@ -288,10 +447,13 @@ void processSubString(String a_inputString)
 void setupBMP280(void)
 {
 
-  printTo("BMP280 Sensor init",1);
+  printTo("BMP280 Sensor init");
   if (!bmp.begin()) {
-    printTo("Could not find a valid BMP280 sensor, check wiring!",1);
-    while (1) delay(10);
+    printTo("Could not find a valid BMP280 sensor, check wiring!");
+    //while (1)
+      blinkError(BMP280);
+    //delay(10);
+    
   }
 
     /* Default settings from datasheet. */
@@ -314,29 +476,30 @@ void setupBMP280(void)
 void setupLSM(void)
 {
 
-  printTo("LSM9DS1 sensor init",1);
+  printTo("LSM9DS1 sensor init");
     // Try to initialise and warn if we couldn't detect the chip
   if (!lsm.begin())
   {
-    printTo("Oops ... unable to initialize the LSM9DS1. Check your wiring!",1);
-    while (1);
+    printTo("Oops ... unable to initialize the LSM9DS1. Check your wiring!");
+   // while (1);
+    blinkError(LSM9DS1);
   }
-  printTo("Found LSM9DS1 9DOF",1);
+  printTo("Found LSM9DS1 9DOF");
   // 1.) Set the accelerometer range
-  lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_2G);
-  //lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_4G);
+  //lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_2G);
+  lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_4G);
   //lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_8G);
   //lsm.setupAccel(lsm.LSM9DS1_ACCELRANGE_16G);
   
   // 2.) Set the magnetometer sensitivity
-  lsm.setupMag(lsm.LSM9DS1_MAGGAIN_4GAUSS);
-  //lsm.setupMag(lsm.LSM9DS1_MAGGAIN_8GAUSS);
+  //lsm.setupMag(lsm.LSM9DS1_MAGGAIN_4GAUSS);
+  lsm.setupMag(lsm.LSM9DS1_MAGGAIN_8GAUSS);
   //lsm.setupMag(lsm.LSM9DS1_MAGGAIN_12GAUSS);
   //lsm.setupMag(lsm.LSM9DS1_MAGGAIN_16GAUSS);
 
   // 3.) Setup the gyroscope
-  lsm.setupGyro(lsm.LSM9DS1_GYROSCALE_245DPS);
-  //lsm.setupGyro(lsm.LSM9DS1_GYROSCALE_500DPS);
+  //lsm.setupGyro(lsm.LSM9DS1_GYROSCALE_245DPS);
+  lsm.setupGyro(lsm.LSM9DS1_GYROSCALE_500DPS);
   //lsm.setupGyro(lsm.LSM9DS1_GYROSCALE_2000DPS);
   
 }
@@ -352,7 +515,7 @@ void setup() {
   SerialBT.begin("ROCket_RS"); //Bluetooth device name
   setupBMP280();
   setupLSM();
-
+  //adcAttachPin(BATPIN);
 }
 
 
@@ -385,69 +548,76 @@ void getLSMData(void)
 
 void doSomePrinting(void)
 {
-  if (set_TE == 1){
-    Serial.print(F("Temperature = "));
-    Serial.print(temp_event.temperature);
-    Serial.println(" *C");
-  }
-  if (set_PE == 1){
-    Serial.print(F("Pressure = "));
-    Serial.print(pressure_event.pressure);
-    Serial.println(" hPa");
-    Serial.println();
-  }
-
+    printTo(F("Temperature = "));
+    printTo((String)temp_event.temperature);
+    printTo(" *C\n");
+    printTo(F("Pressure = "));
+    printTo((String)pressure_event.pressure);
+    printTo(" hPa\n\n");
+ 
   
-  Serial.print("Accel X: "); Serial.print(a.acceleration.x); Serial.print(" m/s^2");
-  Serial.print("\tY: "); Serial.print(a.acceleration.y);     Serial.print(" m/s^2 ");
-  Serial.print("\tZ: "); Serial.print(a.acceleration.z);     Serial.println(" m/s^2 ");
+  printTo("Accel X: "); printTo((String)a.acceleration.x); printTo(" m/s^2");
+  printTo("\tY: "); printTo((String)a.acceleration.y);     printTo(" m/s^2 ");
+  printTo("\tZ: "); printTo((String)a.acceleration.z);     printTo(" m/s^2 \n ");
 
-  Serial.print("Mag X: "); Serial.print(m.magnetic.x);   Serial.print(" uT");
-  Serial.print("\tY: "); Serial.print(m.magnetic.y);     Serial.print(" uT");
-  Serial.print("\tZ: "); Serial.print(m.magnetic.z);     Serial.println(" uT");
+  printTo("Mag X: "); printTo((String)m.magnetic.x);   printTo(" uT");
+  printTo("\tY: "); printTo((String)m.magnetic.y);     printTo(" uT");
+  printTo("\tZ: "); printTo((String)m.magnetic.z);     printTo(" uT\n");
 
-  Serial.print("Gyro X: "); Serial.print(g.gyro.x);   Serial.print(" rad/s");
-  Serial.print("\tY: "); Serial.print(g.gyro.y);      Serial.print(" rad/s");
-  Serial.print("\tZ: "); Serial.print(g.gyro.z);      Serial.println(" rad/s");
+  printTo("Gyro X: "); printTo((String)g.gyro.x);   printTo(" rad/s");
+  printTo("\tY: "); printTo((String)g.gyro.y);      printTo(" rad/s");
+  printTo("\tZ: "); printTo((String)g.gyro.z);      printTo(" rad/s\n\n");
 
-  Serial.println();
 }
 
 void doSomeBTPrinting(void)
 {
-  SerialBT.print("##");
+  String outputString = "##"; 
+  getBMP280Data();
+  getLSMData();
   if (set_TS == 1){
-    SerialBT.print("TS"); SerialBT.print(millis()); SerialBT.print("^");
+    outputString = outputString + "TS" + millis() + "^";
   }
   if (set_TE == 1){
-    SerialBT.print("TE"); SerialBT.print(temp_event.temperature); SerialBT.print("^");
+    outputString = outputString + "TE" + temp_event.temperature + "^";
   }
   if (set_PE == 1){
-    SerialBT.print("PE"); SerialBT.print(pressure_event.pressure); SerialBT.print("^");
+    outputString = outputString + "PE" + pressure_event.pressure + "^";
   }
   if (set_HE == 1){
-  SerialBT.print("PE"); SerialBT.print(bmp.readAltitude(BMP280LocalAirPress)); SerialBT.print("^"); /* Adjusted to local forecast! */
+    outputString = outputString + "HE" + bmp.readAltitude(BMP280LocalAirPress) + "^";
   }
   if (set_AX == 1){
-    SerialBT.print("AX");   SerialBT.print(a.acceleration.x);   SerialBT.print("^");
+    outputString = outputString + "AX" + a.acceleration.x + "^";
   }
   if (set_AY == 1){
-    SerialBT.print("AY");   SerialBT.print(a.acceleration.y);   SerialBT.print("^");
+    outputString = outputString + "AY" + a.acceleration.y + "^";
   }
   if (set_AZ == 1){
-    SerialBT.print("AZ"); SerialBT.print(a.acceleration.z); SerialBT.print("^");
+    outputString = outputString + "AZ" + a.acceleration.z + "^";
   }
-  
-  SerialBT.print("MX"); SerialBT.print(m.magnetic.x);   SerialBT.print("^");
-  SerialBT.print("MY"); SerialBT.print(m.magnetic.y);     SerialBT.print("^");
-  SerialBT.print("MZ"); SerialBT.print(m.magnetic.z);     SerialBT.print("^");
-
-  SerialBT.print("GX"); SerialBT.print(g.gyro.x);   SerialBT.print("^");
-  SerialBT.print("GY"); SerialBT.print(g.gyro.y);      SerialBT.print("^");
-  SerialBT.print("GZ"); SerialBT.print(g.gyro.z);      SerialBT.println("^");
-
-  SerialBT.print("##");
-
+  if (set_MX == 1){
+    outputString = outputString + "MX" + m.magnetic.x + "^";
+  }
+  if (set_MY == 1){
+    outputString = outputString + "MY" + m.magnetic.y + "^";
+  }
+  if (set_MZ == 1){
+    outputString = outputString + "MZ" + m.magnetic.z + "^";
+  }
+  if (set_GX == 1){
+    outputString = outputString + "GX" + g.gyro.x + "^";
+  }
+  if (set_GY == 1){
+    outputString = outputString + "GY" + g.gyro.y + "^";
+  }
+  if (set_GZ == 1){
+    outputString = outputString + "GZ" + g.gyro.z + "^";
+  }
+  outputString.remove(outputString.length());
+  outputString = outputString + "!!";
+    
+  printTo(outputString);
 }
 
 /* function     : loop(void)
@@ -457,19 +627,21 @@ void doSomeBTPrinting(void)
 |* In/Out       : nothing
 */ 
 void loop() {
-  getBMP280Data();
-  getLSMData();
+ // getBMP280Data();
+ // getLSMData();
   //doSomePrinting();
-  serialEvent();
+  //serialEvent();
 
   //if (Serial.available()) {
  //   SerialBT.write(Serial.read());
  // }
   if (SerialBT.available()) {
     //BTSerialEvent();
-    doSomeBTPrinting();
-    //SerialBT.flush();
+    //Serial.print("JJA");
+    serialEvent();
+    //doSomeBTPrinting();
+    SerialBT.flush();
     }
-  
-  delay(10);
+   //doSomeBTPrinting();
+  delay(2);
 }

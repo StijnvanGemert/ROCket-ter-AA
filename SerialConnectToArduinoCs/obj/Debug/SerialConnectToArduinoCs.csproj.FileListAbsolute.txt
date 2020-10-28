@@ -1,0 +1,22 @@
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe.config
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.pdb
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csprojAssemblyReference.cache
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmArduinoSerialConnect.resources
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmMain.resources
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.Properties.Resources.resources
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.GenerateResource.cache
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.exe
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.pdb
+C:\Users\Dick van Kalsbeek\Documents\_ROC archief niet in OneDrive\_Archief tijdloos\VS PE1JTG template classes\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.CoreCompileInputs.cache
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe.config
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.pdb
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csprojAssemblyReference.cache
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmArduinoSerialConnect.resources
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmMain.resources
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.Properties.Resources.resources
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.GenerateResource.cache
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.CoreCompileInputs.cache
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.exe
+C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.pdb
