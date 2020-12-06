@@ -512,7 +512,7 @@ void setupLSM(void)
 */ 
 void setup() {
   Serial.begin(115200);
-  SerialBT.begin("ROCket_RS"); //Bluetooth device name
+  SerialBT.begin("ROCket_RS1"); //Bluetooth device name
   setupBMP280();
   setupLSM();
   //adcAttachPin(BATPIN);

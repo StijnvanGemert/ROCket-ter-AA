@@ -20,3 +20,13 @@ C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\De
 C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.CoreCompileInputs.cache
 C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.exe
 C:\Users\stijn\OneDrive - ROC Ter AA\EBSY\ROCket\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.pdb
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe.config
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.exe
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\bin\Debug\SerialConnectToArduinoCs.pdb
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csprojAssemblyReference.cache
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmArduinoSerialConnect.resources
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.fmMain.resources
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.Properties.Resources.resources
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.csproj.GenerateResource.cache
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.exe
+C:\Users\Stijn van Gemert\OneDrive\Documenten\TerAA\ROCket-ter-AA\SerialConnectToArduinoCs\obj\Debug\SerialConnectToArduinoCs.pdb
